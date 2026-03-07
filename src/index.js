@@ -20,17 +20,7 @@ app.post('/shorten', async (req, res) => {
   const code = nanoid(6);
   await redis.set(code, url);
 
-  return res.status(200).json({ code, short: `/r/${code}` });
-});
-
-app.get('/r/:code', async (req, res) => {
-  const url = await redis.get(req.params.code);
-
-  if (!url) {
-    return res.status(404).json({ error: 'Not found' });
-  }
-
-  return res.redirect(302, url);
+  return res.status(200).json({ code, short: `/${code}` });
 });
 
 app.get('/urls', async (req, res) => {
@@ -38,7 +28,7 @@ app.get('/urls', async (req, res) => {
   return res.status(200).json(entries);
 });
 
-app.delete('/r/:code', async (req, res) => {
+app.delete('/:code', async (req, res) => {
   const deleted = await redis.del(req.params.code);
   if (!deleted) {
     return res.status(404).json({ error: 'Not found' });
@@ -51,6 +41,17 @@ app.get('/health', (req, res) => {
 });
 
 app.use('/ui', express.static(path.join(__dirname, '../www')));
+
+// /:code must be last — lets /health, /urls, /ui resolve first
+app.get('/:code', async (req, res) => {
+  const url = await redis.get(req.params.code);
+
+  if (!url) {
+    return res.status(404).json({ error: 'Not found' });
+  }
+
+  return res.redirect(302, url);
+});
 
 if (require.main === module) {
   app.listen(PORT, () => {

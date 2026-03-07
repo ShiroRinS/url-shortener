@@ -499,7 +499,7 @@
     closeModal();
 
     try {
-      const r = await fetch(`${apiBase()}/r/${code}`, {
+      const r = await fetch(`${apiBase()}/${code}`, {
         method: 'DELETE',
         signal: AbortSignal.timeout(5000),
       });
@@ -541,7 +541,7 @@
     empty.style.display = 'none';
 
     tbody.innerHTML = urls.map(entry => {
-      const short = `/r/${entry.code}`;
+      const short = `/${entry.code}`;
       const full = apiBase() + short;
       const date = entry.createdAt ? new Date(entry.createdAt) : null;
       const dateStr = date

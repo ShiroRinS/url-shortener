@@ -35,16 +35,16 @@ describe('URL Shortener API', () => {
     expect(res.body).toEqual({ error: 'Invalid URL' });
   });
 
-  test('GET /r/:code when found returns 302', async () => {
-    const res = await request(app).get('/r/abc123');
+  test('GET /:code when found returns 302', async () => {
+    const res = await request(app).get('/abc123');
 
     expect(res.status).toBe(302);
   });
 
-  test('GET /r/:code when not found returns 404', async () => {
+  test('GET /:code when not found returns 404', async () => {
     redis.get.mockResolvedValueOnce(null);
 
-    const res = await request(app).get('/r/notfound');
+    const res = await request(app).get('/notfound');
 
     expect(res.status).toBe(404);
     expect(res.body).toEqual({ error: 'Not found' });
@@ -79,10 +79,10 @@ describe('URL Shortener API', () => {
 
   // --- feature C: case insensitive (FAIL on main, pass after merge) ---
 
-  test('GET /r/ABC123 calls redis.get with lowercase "abc123"', async () => {
+  test('GET /ABC123 calls redis.get with lowercase "abc123"', async () => {
     redis.get.mockResolvedValue('https://example.com');
 
-    const res = await request(app).get('/r/ABC123');
+    const res = await request(app).get('/ABC123');
 
     expect(res.status).toBe(302);
     expect(redis.get).toHaveBeenCalledWith('abc123');
