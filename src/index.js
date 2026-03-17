@@ -65,8 +65,10 @@ app.use('/api', api);
 app.use('/ui', express.static(path.join(__dirname, '../www')));
 
 app.get('/:code', async (req, res) => {
-  const url = await redis.get(req.params.code);
+  const code = req.params.code;
+  const url = await redis.get(code);
   if (!url) return res.status(404).json({ error: 'Not found' });
+  redis.incrementClick(code);
   return res.redirect(302, url);
 });
 
