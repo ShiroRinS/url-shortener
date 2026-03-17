@@ -11,8 +11,16 @@ services:
       retries: 5
 
   app:
-    # Use the image from Docker Hub
-    image: ${DOCKERHUB_USERNAME}/url-shortener:latest
+    image: vanijtarnakit/url-shortener:latest
     container_name: url-shortener-app
     platform: linux/amd64
-    # { แก้ไขให้ถูกต้อง }
+    ports:
+      - "3000:3000"
+    environment:
+      - REDIS_HOST=redis
+      - STUDENT_ID_FILE=/app/student_id.txt
+      - BUILD_TIME_FILE=/app/build_time.txt
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped

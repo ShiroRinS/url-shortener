@@ -7,25 +7,26 @@ jobs:
   test:
     name: Run Tests
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Setup Node.js
-      # TODO: Add step to setup Node.js (version 18)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
 
       - name: Install dependencies
-      # TODO: Add step to install dependencies
+        run: npm install
 
       - name: Run tests
-      # TODO: Add step to run tests
+        run: npm test
 
   build:
     name: Build and Push Docker Image
     runs-on: ubuntu-latest
     needs: test
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -34,8 +35,10 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Login to Docker Hub
-      # TODO: Add step to login to Docker Hub
-      # Hint: You need to set DOCKERHUB_USERNAME and DOCKERHUB_TOKEN in repository secrets
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Extract student ID and generate build time
         id: metadata
@@ -44,8 +47,6 @@ jobs:
           BUILD_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
           echo "student_id=$STUDENT_ID" >> $GITHUB_OUTPUT
           echo "build_time=$BUILD_TIME" >> $GITHUB_OUTPUT
-          echo "Student ID: $STUDENT_ID"
-          echo "Build Time: $BUILD_TIME"
 
       - name: Build and push
         uses: docker/build-push-action@v5
